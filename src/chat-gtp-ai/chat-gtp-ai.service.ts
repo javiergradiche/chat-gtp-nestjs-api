@@ -12,8 +12,8 @@ import {
   CreateSequenceDto,
   AnalyzeEmailResponseDto,
   AnalyzeProfileDto,
+  QueryAiModelDto,
 } from './dto';
-import { GetModelAnswer } from './dto/create-ai-mode';
 
 const DEFAULT_MODEL_ID = 'gpt-3.5-turbo';
 const DEFAULT_TEMPERATURE = 0.5;
@@ -45,7 +45,7 @@ export class ChatGtpAiService {
   }
 
   async getModelAnswer(
-    input: GetModelAnswer,
+    input: QueryAiModelDto,
   ): Promise<
     CreateCompletionResponse | CreateCompletionResponseChoicesInner[]
   > {
@@ -69,7 +69,7 @@ export class ChatGtpAiService {
   }
 
   async getChatGPTModelAnswer(
-    input: GetModelAnswer,
+    input: QueryAiModelDto,
   ): Promise<
     CreateChatCompletionResponse | CreateCompletionResponseChoicesInner[]
   > {

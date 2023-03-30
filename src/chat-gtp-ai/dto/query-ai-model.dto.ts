@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsNotEmpty } from 'class-validator';
 
-export class GetModelAnswer {
+export class QueryAiModelDto {
   @IsString()
   @IsNotEmpty()
   question: string;

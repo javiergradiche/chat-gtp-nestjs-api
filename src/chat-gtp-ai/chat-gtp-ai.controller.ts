@@ -11,8 +11,8 @@ import {
   CreateSequenceDto,
   AnalyzeEmailResponseDto,
   AnalyzeProfileDto,
+  QueryAiModelDto,
 } from './dto';
-import { GetModelAnswer } from './dto/create-ai-mode';
 
 @Controller('chat-gtp-ai')
 export class ChatGtpAiController {
@@ -20,13 +20,13 @@ export class ChatGtpAiController {
 
   @Post('/message')
   @UsePipes(ValidationPipe)
-  getModelAnswer(@Body() data: GetModelAnswer) {
+  getModelAnswer(@Body() data: QueryAiModelDto) {
     return this.chatGtpAiService.getModelAnswer(data);
   }
 
   @Post('/gpt-message')
   @UsePipes(ValidationPipe)
-  getChatGPTModelAnswer(@Body() data: GetModelAnswer) {
+  getChatGPTModelAnswer(@Body() data: QueryAiModelDto) {
     return this.chatGtpAiService.getChatGPTModelAnswer(data);
   }
 
