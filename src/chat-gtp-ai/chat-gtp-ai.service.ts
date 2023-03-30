@@ -19,7 +19,8 @@ const DEFAULT_MODEL_ID = 'gpt-3.5-turbo';
 const DEFAULT_TEMPERATURE = 0.5;
 const DEFAULT_MAX_TOKENS = 2000;
 const PROMPT_FOR_SEPARATORS =
-  '. Use separators #subject-start, #subject-end, #body-start, #body-end. For variables to replace use {{camelCase}}';
+  '. Use separators #subject-start, #subject-end, #body-start, #body-end. For variables to replace use {{snake_case}}';
+
 @Injectable()
 export class ChatGtpAiService {
   private readonly openai: OpenAIApi;
