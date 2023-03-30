@@ -4,6 +4,20 @@
 
 # Endpoints
 
+## Generic Davinci Request
+
+`POST /chat-gpt-ai/message`
+
+Body:
+`{ question: "string" }`
+
+## Generic WebGPT Request
+
+`POST /chat-gpt-ai/message-gpt`
+
+Body:
+`{ question: "string" }`
+
 ## Create a sequence of emails
 
 `POST /chat-gpt-ai/create-sequence`
