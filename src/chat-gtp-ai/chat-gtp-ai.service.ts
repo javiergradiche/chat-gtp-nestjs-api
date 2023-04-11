@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
   Configuration,
   OpenAIApi,
@@ -7,19 +7,19 @@ import {
   CreateCompletionResponseChoicesInner,
   CreateChatCompletionResponse,
   CreateChatCompletionRequest,
-} from 'openai';
+} from "openai";
 import {
   CreateSequenceDto,
   AnalyzeEmailResponseDto,
   AnalyzeProfileDto,
   QueryAiModelDto,
-} from './dto';
+} from "./dto";
 
-const DEFAULT_MODEL_ID = 'gpt-3.5-turbo';
+const DEFAULT_MODEL_ID = "gpt-3.5-turbo";
 const DEFAULT_TEMPERATURE = 0.5;
 const DEFAULT_MAX_TOKENS = 2000;
 const PROMPT_FOR_SEPARATORS =
-  '. Use separators #subject-start, #subject-end, #body-start, #body-end. For variables to replace use {{snake_case}}';
+  ". Use separators #subject-start, #subject-end, #body-start, #body-end. For variables to replace use {{snake_case}}";
 
 @Injectable()
 export class ChatGtpAiService {
@@ -27,15 +27,16 @@ export class ChatGtpAiService {
 
   constructor() {
     const configuration = new Configuration({
-      organization: process.env.OPENAI_ORGANIZATION,
+      organization: process.env.OPENAI_ORG_ID,
       apiKey: process.env.OPENAI_API_KEY,
     });
+    console.log("CONFIGURATION: ", configuration);
     this.openai = new OpenAIApi(configuration);
   }
 
   secureModelId(modelId: string) {
-    if (modelId.includes(':')) {
-      return modelId.replace(':', '-');
+    if (modelId.includes(":")) {
+      return modelId.replace(":", "-");
     }
     return modelId;
   }
@@ -46,7 +47,7 @@ export class ChatGtpAiService {
   }
 
   async getModelAnswer(
-    input: QueryAiModelDto,
+    input: QueryAiModelDto
   ): Promise<
     CreateCompletionResponse | CreateCompletionResponseChoicesInner[]
   > {
@@ -54,7 +55,7 @@ export class ChatGtpAiService {
     try {
       const params: CreateCompletionRequest = {
         prompt: question,
-        model: modelId ? this.secureModelId(modelId) : 'text-davinci-003',
+        model: modelId ? this.secureModelId(modelId) : "text-davinci-003",
         temperature: temperature || DEFAULT_TEMPERATURE,
         max_tokens: maxTokens || DEFAULT_MAX_TOKENS,
       };
@@ -65,12 +66,12 @@ export class ChatGtpAiService {
       if (data.choices) return data.choices;
       return response.data;
     } catch (error) {
-      throw Error('Error in getModelAnswer ' + error);
+      throw Error("Error in getModelAnswer " + error);
     }
   }
 
   async getChatGPTModelAnswer(
-    input: QueryAiModelDto,
+    input: QueryAiModelDto
   ): Promise<
     CreateChatCompletionResponse | CreateCompletionResponseChoicesInner[]
   > {
@@ -82,7 +83,7 @@ export class ChatGtpAiService {
         max_tokens: maxTokens || DEFAULT_MAX_TOKENS,
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: question,
           },
         ],
@@ -91,11 +92,11 @@ export class ChatGtpAiService {
       const response = await this.openai.createChatCompletion(params);
       const { data } = response;
 
-      console.log('RESPNSE: ', response);
+      console.log("RESPNSE: ", response);
       if (data.choices) return data.choices;
       return response.data;
     } catch (error) {
-      throw Error('Error in getModelAnswer ' + error);
+      throw Error("Error in getModelAnswer " + error);
     }
   }
 
@@ -121,7 +122,7 @@ export class ChatGtpAiService {
         max_tokens: maxTokens || DEFAULT_MAX_TOKENS,
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: question,
           },
         ],
@@ -136,7 +137,7 @@ export class ChatGtpAiService {
         return { emails, variables };
       }
     } catch (error) {
-      throw Error('Error in create Sequence ' + error);
+      throw Error("Error in create Sequence " + error);
     }
   }
 
@@ -161,12 +162,13 @@ export class ChatGtpAiService {
         max_tokens: maxTokens || DEFAULT_MAX_TOKENS,
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: question,
           },
         ],
       };
       const response = await this.openai.createChatCompletion(params);
+      console.log("RESPONSE: ", response);
       const { data } = response;
 
       if (data.choices) {
@@ -175,7 +177,7 @@ export class ChatGtpAiService {
         return { analysis, rating };
       }
     } catch (error) {
-      throw Error('Error in analysis: ' + error);
+      throw Error("Error in analysis: " + error);
     }
   }
 
@@ -185,7 +187,7 @@ export class ChatGtpAiService {
     let question = template || process.env.TEMPLATE_REVIEW_EMAIL_RESPONSE;
     question = question.replace(/{{emailResponse}}/g, emailResponse);
 
-    console.log('QUESTION: ', question);
+    console.log("QUESTION: ", question);
     try {
       const params: CreateChatCompletionRequest = {
         model: modelId ? this.secureModelId(modelId) : DEFAULT_MODEL_ID,
@@ -193,7 +195,7 @@ export class ChatGtpAiService {
         max_tokens: maxTokens || DEFAULT_MAX_TOKENS,
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: question,
           },
         ],
@@ -207,22 +209,22 @@ export class ChatGtpAiService {
         return { analysis, interest };
       }
     } catch (error) {
-      throw Error('Error in analysis: ' + error);
+      throw Error("Error in analysis: " + error);
     }
   }
   splitResponseToEmails = (response: string) => {
     const emailArray = [];
     const subjectMatches = response.match(
-      /#subject-start(.|\n)*?#subject-end/g,
+      /#subject-start(.|\n)*?#subject-end/g
     );
     const bodyMatches = response.match(/#body-start(.|\n)*?#body-end/g);
     for (let i = 0; i < bodyMatches.length; i++) {
       const subject = subjectMatches[i]
-        .replace('#subject-start\n', '')
-        .replace('\n#subject-end', '');
+        .replace("#subject-start\n", "")
+        .replace("\n#subject-end", "");
       const body = bodyMatches[i]
-        .replace('#body-start\n', '')
-        .replace('#body-end', '');
+        .replace("#body-start\n", "")
+        .replace("#body-end", "");
       const variables = this.extractVariables(body);
       emailArray.push({ subject, body, variables });
     }
@@ -233,8 +235,8 @@ export class ChatGtpAiService {
     const variables = response.match(/{{(.)*?}}/g);
     const variablesArray = [];
     for (let i = 0, l = variables.length; i < l; i++) {
-      const variableName = variables[i].replace('{{', '').replace('}}', '');
-      if (variablesArray.indexOf(variableName) === -1 && variableName !== '')
+      const variableName = variables[i].replace("{{", "").replace("}}", "");
+      if (variablesArray.indexOf(variableName) === -1 && variableName !== "")
         variablesArray.push(variableName);
     }
     return variablesArray;
@@ -246,7 +248,7 @@ export class ChatGtpAiService {
   };
 
   extractInterest = (response: string) => {
-    const category = response.split('Category: ')[1];
+    const category = response.split("Category: ")[1];
     return category;
   };
 }

@@ -3,49 +3,52 @@ import {
   Controller,
   Get,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
-} from '@nestjs/common';
-import { ChatGtpAiService } from './chat-gtp-ai.service';
+} from "@nestjs/common";
+import { ChatGtpAiService } from "./chat-gtp-ai.service";
 import {
   CreateSequenceDto,
   AnalyzeEmailResponseDto,
   AnalyzeProfileDto,
   QueryAiModelDto,
-} from './dto';
+} from "./dto";
+import { AuthGuard } from "./auth.guard";
 
-@Controller('chat-gtp-ai')
+@Controller("chat-gtp-ai")
+@UseGuards(AuthGuard)
 export class ChatGtpAiController {
   constructor(private readonly chatGtpAiService: ChatGtpAiService) {}
 
-  @Post('/message')
+  @Post("/message")
   @UsePipes(ValidationPipe)
   getModelAnswer(@Body() data: QueryAiModelDto) {
     return this.chatGtpAiService.getModelAnswer(data);
   }
 
-  @Post('/gpt-message')
+  @Post("/gpt-message")
   @UsePipes(ValidationPipe)
   getChatGPTModelAnswer(@Body() data: QueryAiModelDto) {
     return this.chatGtpAiService.getChatGPTModelAnswer(data);
   }
 
-  @Get('/models')
+  @Get("/models")
   getModels() {
     return this.chatGtpAiService.listModels();
   }
 
-  @Post('/create-sequence')
+  @Post("/create-sequence")
   createSequence(@Body() data: CreateSequenceDto) {
     return this.chatGtpAiService.createSequence(data);
   }
 
-  @Post('/analyze-profile')
+  @Post("/analyze-profile")
   analyzeProfile(@Body() data: AnalyzeProfileDto) {
     return this.chatGtpAiService.analyzeProfile(data);
   }
 
-  @Post('/analyze-response')
+  @Post("/analyze-response")
   analyzeEmailResponse(@Body() data: AnalyzeEmailResponseDto) {
     return this.chatGtpAiService.analyzeEmailResponse(data);
   }
